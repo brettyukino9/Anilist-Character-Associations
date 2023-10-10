@@ -148,6 +148,7 @@ res2 = {key: val for key, val in sorted(crossover_count_map.items(), key = lambd
 
 # Figure out how liking the specified character affects the accuracy; report the biggest changes
 new_chances_map = {}
+lifts = {}
 for key, value in res2.items() :
     if(crossover_count_map[key] < 7) :
         continue
@@ -156,13 +157,26 @@ for key, value in res2.items() :
     new_chance = chance_given_specified / chance_normally
     new_chances_map[key] = new_chance
 
+    support_x_or_y = (map[specified]+map[key]-crossover_count_map[key])/user_count
+    support_x = map[specified]/user_count
+    support_y = map[key]/user_count
+    lifts[key] = support_x_or_y/ (support_x * support_y)
+
+
 res3 = {key: val for key, val in sorted(new_chances_map.items(), key = lambda ele: ele[1], reverse = True)}
+res4 = {key: val for key, val in sorted(lifts.items(), key = lambda ele: ele[1], reverse = True)}
 
 
 with open('Results/'+specified+' results.txt', 'w', encoding='utf8') as f:
     f.write("Most likely characters someone will like if they like "+specified+"\n")
     f.write("-----------------------------------------------------------------------\n")
     for key, value in res3.items() :
+        f.write(key+' : '+str(value)+"x\n")
+
+with open('Results/'+specified+' lift results.txt', 'w', encoding='utf8') as f:
+    f.write("Most likely characters someone will like if they like "+specified+"\n")
+    f.write("-----------------------------------------------------------------------\n")
+    for key, value in res4.items() :
         f.write(key+' : '+str(value)+"x\n")
 
 if(other_specified != "") :
